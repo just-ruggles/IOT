@@ -105,7 +105,3 @@ st.write(values)
 if st.button('📨 Enviar valor analógico'):
     message = json.dumps({"Analog": float(values)})
     client.publish("cmqtt_a", message)
-
-# 📊 Mostrar valor recibido
-st.markdown('<h3 style="color: black;">Último valor recibido:</h3>', unsafe_allow_html=True)
-st.write(st.session_state["mensaje_actual"])
