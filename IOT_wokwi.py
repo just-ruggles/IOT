@@ -109,8 +109,3 @@ if st.button('📨 Enviar valor analógico'):
 # 📊 Mostrar valor recibido
 st.markdown('<h3 style="color: black;">Último valor recibido:</h3>', unsafe_allow_html=True)
 st.write(st.session_state["mensaje_actual"])
-
-# 📈 Mostrar gráfico en tiempo real
-if st.session_state["data"]:
-    df = pd.DataFrame(st.session_state["data"], columns=["Valores"])
-    st.line_chart(df)
