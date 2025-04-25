@@ -4,6 +4,20 @@ import streamlit as st
 import json
 import platform
 
+st.markdown(
+    """
+    <style>
+    .stApp {
+        background-image: url("https://i.redd.it/cq8btdxz1x2b1.jpg");
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
 # 🌟 Estilos personalizados
 st.markdown("""
     <style>
@@ -50,7 +64,7 @@ client1 = paho.Client("GIT-HUB")
 client1.on_message = on_message
 
 # 🔘 Botón ON
-if st.button('🔴 Encender (ON)'):
+if st.button('Encender (ON)'):
     act1 = "ON"
     client1 = paho.Client("GIT-HUB")
     client1.on_publish = on_publish
@@ -59,7 +73,7 @@ if st.button('🔴 Encender (ON)'):
     client1.publish("cmqtt_s", message)
 
 # 🔘 Botón OFF
-if st.button('⚪ Apagar (OFF)'):
+if st.button('Apagar (OFF)'):
     act1 = "OFF"
     client1 = paho.Client("GIT-HUB")
     client1.on_publish = on_publish
