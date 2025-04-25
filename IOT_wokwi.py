@@ -3,13 +3,17 @@ import time
 import streamlit as st
 import json
 import platform
+import pandas as pd
+
+# Variables para graficar
+data_received = []
 
 # 🌄 Fondo personalizado
 st.markdown(
     """
     <style>
     .stApp {
-        background-image: url("https://preview.redd.it/spider-verse-portal-wallpaper-v0-0o1jvz8hjfie1.jpeg?auto=webp&s=ade4bc1fee3aee0f1a10c12090829d2c167827fd");
+        background-image: url("https://i.redd.it/cq8btdxz1x2b1.jpg");
         background-size: cover;
         background-position: center;
         background-attachment: fixed;
@@ -22,8 +26,10 @@ st.markdown(
 # 🌟 Estilos personalizados
 st.markdown("""
     <style>
-        h1 {
+        .custom-title {
+            font-size: 40px;
             color: red;
+            font-weight: bold;
         }
         .stButton>button {
             color: white;
@@ -40,56 +46,71 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# 🔺 Título principal
-st.markdown('<h1>MQTT Control</h1>', unsafe_allow_html=True)
+# 🔺 Título principal rojo
+st.markdown('<div class="custom-title">MQTT Control</div>', unsafe_allow_html=True)
 
-# Muestra la versión de Python
+# Versión de Python
 st.markdown('<h3 style="color: black;">Versión de Python:</h3>', unsafe_allow_html=True)
 st.write(platform.python_version())
 
-# Variables iniciales
-values = 0.0
-act1 = "OFF"
-
-# Callbacks MQTT
-def on_publish(client, userdata, result):
-    print("El dato ha sido publicado.")
-
-def on_message(client, userdata, message):
-    message_received = message.payload.decode("utf-8")
-    st.write("📩 Mensaje recibido:", message_received)
-
-# Configuración MQTT
+# MQTT configuración
 broker = "157.230.214.127"
 port = 1883
 
-# 🔘 Botón ON
+# Inicializar cliente
+client = paho.Client("GIT-HUB")
+
+# Callback de publicación
+def on_publish(client, userdata, result):
+    print("Dato publicado.")
+
+# Callback de recepción
+def on_message(client, userdata, message):
+    payload = message.payload.decode("utf-8")
+    st.session_state["mensaje_actual"] = payload
+    try:
+        valor = float(payload)
+        st.session_state["data"].append(valor)
+    except:
+        pass
+
+# Conectar cliente
+client.on_publish = on_publish
+client.on_message = on_message
+client.connect(broker, port)
+client.loop_start()
+client.subscribe("cmqtt_a")
+
+# Inicializar estado de sesión
+if "data" not in st.session_state:
+    st.session_state["data"] = []
+if "mensaje_actual" not in st.session_state:
+    st.session_state["mensaje_actual"] = "Esperando datos..."
+
+# 🔘 Botones de encendido/apagado
 if st.button('Encender (ON)'):
-    act1 = "ON"
-    client = paho.Client("GIT-HUB")
-    client.on_publish = on_publish
-    client.connect(broker, port)
-    message = json.dumps({"Act1": act1})
+    message = json.dumps({"Act1": "ON"})
     client.publish("cmqtt_s", message)
 
-# 🔘 Botón OFF
 if st.button('Apagar (OFF)'):
-    act1 = "OFF"
-    client = paho.Client("GIT-HUB")
-    client.on_publish = on_publish
-    client.connect(broker, port)
-    message = json.dumps({"Act1": act1})
+    message = json.dumps({"Act1": "OFF"})
     client.publish("cmqtt_s", message)
 
-# 🎚️ Slider y valor mostrado
+# 🎚️ Slider
 values = st.slider('Selecciona el rango de valores (0 a 100)', 0.0, 100.0)
 st.markdown('<h3 style="color: black;">Valor seleccionado:</h3>', unsafe_allow_html=True)
 st.write(values)
 
-# 📤 Botón para enviar valor analógico
+# 📤 Enviar valor
 if st.button('📨 Enviar valor analógico'):
-    client = paho.Client("GIT-HUB")
-    client.on_publish = on_publish
-    client.connect(broker, port)
     message = json.dumps({"Analog": float(values)})
     client.publish("cmqtt_a", message)
+
+# 📊 Mostrar valor recibido
+st.markdown('<h3 style="color: black;">Último valor recibido:</h3>', unsafe_allow_html=True)
+st.write(st.session_state["mensaje_actual"])
+
+# 📈 Mostrar gráfico en tiempo real
+if st.session_state["data"]:
+    df = pd.DataFrame(st.session_state["data"], columns=["Valores"])
+    st.line_chart(df)
