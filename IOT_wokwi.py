@@ -43,7 +43,7 @@ st.markdown("""
 st.markdown("<h1 style="color: red;">MQTT Control</h1>", unsafe_allow_html=True)
 
 # Muestra la versión de Python
-st.write("<h1 style="color: black;">Versión de Python:</h1>", platform.python_version(), unsafe_allow_html=True)
+st.write("<h3 style="color: black;">Versión de Python:</h3>", platform.python_version(), unsafe_allow_html=True)
 
 values = 0.0
 act1 = "OFF"
@@ -83,7 +83,7 @@ if st.button('Apagar (OFF)'):
 
 # 🎚️ Slider mejor presentado
 values = st.slider('Selecciona el rango de valores (0 a 100)', 0.0, 100.0)
-st.write(<h1 style="color: black;">'Valor seleccionado:</h1>', values, unsafe_allow_html=True)
+st.write(<h3 style="color: black;">'Valor seleccionado:</h3>', values, unsafe_allow_html=True)
 
 # 📤 Enviar valor analógico
 if st.button('📨 Enviar valor analógico'):
