@@ -4,6 +4,7 @@ import streamlit as st
 import json
 import platform
 
+# 🌄 Fondo personalizado
 st.markdown(
     """
     <style>
@@ -40,55 +41,55 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # 🔺 Título principal
-st.markdown("<h1 style="color: red;">MQTT Control</h1>", unsafe_allow_html=True)
+st.markdown('<h1>MQTT Control</h1>', unsafe_allow_html=True)
 
 # Muestra la versión de Python
-st.write("<h3 style="color: black;">Versión de Python:</h3>", platform.python_version(), unsafe_allow_html=True)
+st.markdown('<h3 style="color: black;">Versión de Python:</h3>', unsafe_allow_html=True)
+st.write(platform.python_version())
 
+# Variables iniciales
 values = 0.0
 act1 = "OFF"
 
+# Callbacks MQTT
 def on_publish(client, userdata, result):
-    print("el dato ha sido publicado \n")
+    print("El dato ha sido publicado.")
 
 def on_message(client, userdata, message):
-    global message_received
-    time.sleep(2)
-    message_received = str(message.payload.decode("utf-8"))
-    st.write(message_received)
+    message_received = message.payload.decode("utf-8")
+    st.write("📩 Mensaje recibido:", message_received)
 
 # Configuración MQTT
 broker = "157.230.214.127"
 port = 1883
-client1 = paho.Client("GIT-HUB")
-client1.on_message = on_message
 
 # 🔘 Botón ON
 if st.button('Encender (ON)'):
     act1 = "ON"
-    client1 = paho.Client("GIT-HUB")
-    client1.on_publish = on_publish
-    client1.connect(broker, port)
+    client = paho.Client("GIT-HUB")
+    client.on_publish = on_publish
+    client.connect(broker, port)
     message = json.dumps({"Act1": act1})
-    client1.publish("cmqtt_s", message)
+    client.publish("cmqtt_s", message)
 
 # 🔘 Botón OFF
 if st.button('Apagar (OFF)'):
     act1 = "OFF"
-    client1 = paho.Client("GIT-HUB")
-    client1.on_publish = on_publish
-    client1.connect(broker, port)
+    client = paho.Client("GIT-HUB")
+    client.on_publish = on_publish
+    client.connect(broker, port)
     message = json.dumps({"Act1": act1})
-    client1.publish("cmqtt_s", message)
+    client.publish("cmqtt_s", message)
 
-# 🎚️ Slider mejor presentado
+# 🎚️ Slider y valor mostrado
 values = st.slider('Selecciona el rango de valores (0 a 100)', 0.0, 100.0)
-st.write(<h3 style="color: black;">'Valor seleccionado:</h3>', values, unsafe_allow_html=True)
+st.markdown('<h3 style="color: black;">Valor seleccionado:</h3>', unsafe_allow_html=True)
+st.write(values)
 
-# 📤 Enviar valor analógico
+# 📤 Botón para enviar valor analógico
 if st.button('📨 Enviar valor analógico'):
-    client1 = paho.Client("GIT-HUB")
-    client1.on_publish = on_publish
-    client1.connect(broker, port)
+    client = paho.Client("GIT-HUB")
+    client.on_publish = on_publish
+    client.connect(broker, port)
     message = json.dumps({"Analog": float(values)})
-    client1.publish("cmqtt_a", message)
+    client.publish("cmqtt_a", message)
